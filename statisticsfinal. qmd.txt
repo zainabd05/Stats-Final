@@ -1,0 +1,77 @@
+---
+title: "Statistics Final Project"
+author: Zainab Daver, Moshor Hassan
+format: html
+editor: visual
+---
+
+This project uses a dataset on video game habits among participants over a one-month period. The goal is to examine how much time people spend playing video games on weekdays compared to weekends and whether there is a statistically significant difference between them.
+
+
+The dataset includes the following variables:
+
+- `participant_id`: A unique identifier for each participant (categorical)
+- `weekday_playtime`: Total average playtime on weekdays in hours (numeric)
+- `weekend_playtime`: Total average playtime on weekends in hours (numeric)
+- `age`: Age of participant (numeric)
+- `gender`: Gender of participant (categorical: Male, Female, Other)
+
+Research Questions
+
+1. How does video game playtime compare between weekdays and weekends?
+2. Is there a correlation between age and average weekend playtime?
+
+
+Histogram of Weekend Playtime
+
+```{r}
+hist(data$weekend_playtime, 
+     main = "Distribution of Weekend Playtime", 
+     xlab = "Hours Played", 
+     col = "lightblue", 
+     border = "white")
+
+Boxplot of Weekday vs. Weekend Playtime
+{r}
+library(tidyr)
+library(ggplot2)
+
+long_data <- data %>%
+  pivot_longer(cols = c(weekday_playtime, weekend_playtime), 
+               names_to = "day_type", 
+               values_to = "hours_played")
+
+ggplot(long_data, aes(x = day_type, y = hours_played, fill = day_type)) +
+  geom_boxplot() +
+  labs(title = "Video Game Playtime: Weekdays vs. Weekends", x = "Day Type", y = "Hours Played") +
+  scale_fill_manual(values = c("skyblue", "lightgreen")) +
+  theme_minimal()
+
+
+Summary Statistics
+{r}
+library(dplyr)
+
+data %>%
+  summarize(
+    mean_weekday = mean(weekday_playtime, na.rm = TRUE),
+    sd_weekday = sd(weekday_playtime, na.rm = TRUE),
+    mean_weekend = mean(weekend_playtime, na.rm = TRUE),
+    sd_weekend = sd(weekend_playtime, na.rm = TRUE)
+  )
+
+Paired Sample T-test
+We use a paired t-test since each participant has both weekday and weekend playtime data.
+{r}
+t.test(data$weekday_playtime, data$weekend_playtime, paired = TRUE)
+
+
+Correlation: Age vs. Weekend Playtime
+{r}
+CopyEdit
+cor.test(data$age, data$weekend_playtime)
+
+
+Conclusion:
+In this project, we analyzed a dataset of participants' video game habits to explore how playtime differs between weekdays and weekends. Descriptive statistics showed that weekend playtime tends to be higher, with a wider spread. Visualizations including histograms and boxplots helped illustrate this difference clearly.
+Using a paired sample t-test, I found a statistically significant difference in playtime between weekdays and weekends, suggesting that people play significantly more on weekends. Additionally, a correlation test showed a weak negative correlation between age and weekend playtime, indicating that age may have a minor influence on weekend gaming habits. These findings highlight behavioral patterns that may be useful for game developers or digital wellbeing studies.
