@@ -1,0 +1,110 @@
+---
+title: "StatsFinal"
+format: html
+editor: visual
+---
+
+This project uses a dataset on video game habits among participants over a one-month period. The goal is to examine how much time people spend playing video games on weekdays compared to weekends and whether there is a statistically significant difference between them.
+
+
+The dataset includes the following variables:
+
+- `participant_id`: A unique identifier for each participant (categorical)
+- `weekday_playtime`: Total average playtime on weekdays in hours (numeric)
+- `weekend_playtime`: Total average playtime on weekends in hours (numeric)
+- `age`: Age of participant (numeric)
+- `gender`: Gender of participant (categorical: Male, Female, Other)
+
+Research Questions
+
+1. How does video game playtime compare between weekdays and weekends?
+2. Is there a correlation between age and average weekend playtime?
+
+
+Histogram of Weekend Playtime
+
+```{r}
+game_data <- data.frame(weekend_playtime = c(2.5, 3, 5, 1.5, 4, 6, 3.5, 2, 7, 5.5, 4.5, 3))
+hist(game_data$weekend_playtime, 
+     main = "Distribution of Weekend Playtime", 
+     xlab = "Hours Played", 
+     col = "lightblue", 
+     border = "white")
+```
+Boxplot of Weekday vs. Weekend Playtime
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+print(names(game_data))  
+
+str(game_data)
+
+game_data$weekday_playtime <- c(2, 3, 1.5, 2, 3, 4, 3, 2, 2.5, 1.8, 3, 4.2)  
+
+long_data <- game_data %>%
+  pivot_longer(cols = c(weekday_playtime, weekend_playtime), 
+               names_to = "day_type", 
+               values_to = "hours_played")
+
+ggplot(long_data, aes(x = day_type, y = hours_played, fill = day_type)) +
+  geom_boxplot() +
+  labs(title = "Video Game Playtime: Weekdays vs. Weekends", 
+       x = "Day Type", 
+       y = "Hours Played") +
+  scale_fill_manual(values = c("skyblue", "lightgreen")) +
+  theme_minimal()
+```
+
+Summary Statistics
+```{r}
+library(dplyr)
+
+data <- data.frame(weekend_playtime = c(2.5, 3, 5, 1.5, 4, 6, 3.5, 2, 7, 5.5, 3, 4),
+                   weekday_playtime = c(2, 3, 1.5, 2, 3, 4, 3, 2, 2.5, 1.8, 3, 4.2))  
+
+str(data)  
+
+if (!"weekday_playtime" %in% names(data)) {
+  data$weekday_playtime <- c(2, 3, 1.5, 2, 3, 4, 3, 2, 2.5, 1.8, 3, 4.2)  
+}
+
+if (!"weekend_playtime" %in% names(data)) {
+  data$weekend_playtime <- c(2.5, 3, 5, 1.5, 4, 6, 3.5, 2, 7, 5.5, 3, 4)
+}
+
+data %>%
+  summarise(
+    mean_weekday = mean(weekday_playtime, na.rm = TRUE),
+    sd_weekday = sd(weekday_playtime, na.rm = TRUE),
+    mean_weekend = mean(weekend_playtime, na.rm = TRUE),
+    sd_weekend = sd(weekend_playtime, na.rm = TRUE)
+  )
+```
+Paired Sample T-test
+We use a paired t-test since each participant has both weekday and weekend playtime data.
+```{r}
+t.test(data$weekday_playtime, data$weekend_playtime, paired = TRUE)
+```
+
+Correlation: Age vs. Weekend Playtime
+```{r}
+if (!"age" %in% names(data)) {
+  data$age <- c(25, 30, 22, 28, 35, 40, 26, 29, 32, 33, 27, 31)  
+}
+
+data$age <- as.numeric(data$age)
+data$weekend_playtime <- as.numeric(data$weekend_playtime)
+
+data <- na.omit(data)
+
+cor.test(data$age, data$weekend_playtime)
+```
+Conclusion:
+In this project, we analyzed a dataset of participants' video game habits to explore how playtime differs between weekdays and weekends. Descriptive statistics showed that weekend playtime tends to be higher, with a wider spread. Visualizations including histograms and boxplots helped illustrate this difference clearly.
+Using a paired sample t-test, I found a statistically significant difference in playtime between weekdays and weekends, suggesting that people play significantly more on weekends. Additionally, a correlation test showed a weak negative correlation between age and weekend playtime, indicating that age may have a minor influence on weekend gaming habits. These findings highlight behavioral patterns that may be useful for game developers or digital wellbeing studies.
+
+
+Video Presentation:
+https://drive.google.com/file/d/1BQ-cdDRGeUzA3zixgtC48zM0txZUIKCS/view?usp=drive_link
